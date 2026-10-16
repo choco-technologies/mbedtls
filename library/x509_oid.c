@@ -8,6 +8,7 @@
  */
 
 #include "x509_internal.h"
+#include "mbedtls/dmod.h"
 
 /* Each group of tables and functions has its own dependencies, but
  * don't even bother to define helper macros if X.509 is completely
@@ -32,10 +33,10 @@
  */
 #if !defined(MBEDTLS_X509_REMOVE_INFO)
 #define OID_DESCRIPTOR(s, name, description)  { ADD_LEN(s), name, description }
-#define NULL_OID_DESCRIPTOR                   { NULL, 0, NULL, NULL }
+#define NULL_OID_DESCRIPTOR                   { MBEDTLS_DMOD_NULL_TEXT, 0, MBEDTLS_DMOD_NULL_TEXT, MBEDTLS_DMOD_NULL_TEXT }
 #else
 #define OID_DESCRIPTOR(s, name, description)  { ADD_LEN(s) }
-#define NULL_OID_DESCRIPTOR                   { NULL, 0 }
+#define NULL_OID_DESCRIPTOR                   { MBEDTLS_DMOD_NULL_TEXT, 0 }
 #endif
 
 /*
@@ -50,7 +51,7 @@
         const mbedtls_x509_oid_descriptor_t *cur =                           \
             (const mbedtls_x509_oid_descriptor_t *) p;                       \
         if (p == NULL || oid == NULL) return NULL;                  \
-        while (cur->asn1 != NULL) {                                    \
+        while (cur->asn1_len != 0) {                                    \
             if (cur->asn1_len == oid->len &&                            \
                 memcmp(cur->asn1, oid->p, oid->len) == 0) {          \
                 return p;                                            \
@@ -151,7 +152,11 @@
 #if defined(MBEDTLS_X509_USE_C)
 typedef struct {
     mbedtls_x509_oid_descriptor_t    descriptor;
+#if defined(MBEDTLS_DMOD_C)
+    char short_name[32];
+#else
     const char          *short_name;
+#endif
 } oid_x520_attr_t;
 
 static const oid_x520_attr_t oid_x520_attr_type[] =
@@ -253,7 +258,7 @@ static const oid_x520_attr_t oid_x520_attr_type[] =
     },
     {
         NULL_OID_DESCRIPTOR,
-        NULL,
+        MBEDTLS_DMOD_NULL_TEXT,
     }
 };
 

@@ -18,6 +18,7 @@
  */
 
 #include "x509_internal.h"
+#include "mbedtls/dmod.h"
 
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
 
@@ -1891,13 +1892,17 @@ int mbedtls_x509_crt_info(char *buf, size_t size, const char *prefix,
 
 struct x509_crt_verify_string {
     int code;
+#if defined(MBEDTLS_DMOD_C)
+    char string[256];
+#else
     const char *string;
+#endif
 };
 
 #define X509_CRT_ERROR_INFO(err, err_str, info) { err, info },
 static const struct x509_crt_verify_string x509_crt_verify_strings[] = {
     MBEDTLS_X509_CRT_ERROR_INFO_LIST
-    { 0, NULL }
+    { 0, MBEDTLS_DMOD_NULL_TEXT }
 };
 #undef X509_CRT_ERROR_INFO
 
@@ -1909,7 +1914,7 @@ int mbedtls_x509_crt_verify_info(char *buf, size_t size, const char *prefix,
     char *p = buf;
     size_t n = size;
 
-    for (cur = x509_crt_verify_strings; cur->string != NULL; cur++) {
+    for (cur = x509_crt_verify_strings; cur->code != 0; cur++) {
         if ((flags & cur->code) == 0) {
             continue;
         }

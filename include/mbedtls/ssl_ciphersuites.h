@@ -268,7 +268,11 @@ typedef struct mbedtls_ssl_ciphersuite_t mbedtls_ssl_ciphersuite_t;
  */
 struct mbedtls_ssl_ciphersuite_t {
     int MBEDTLS_PRIVATE(id);
+#if defined(MBEDTLS_DMOD_C)
+    char MBEDTLS_PRIVATE(name)[80];
+#else
     const char *MBEDTLS_PRIVATE(name);
+#endif
 
     uint8_t MBEDTLS_PRIVATE(cipher);           /* mbedtls_cipher_type_t */
     uint8_t MBEDTLS_PRIVATE(mac);              /* mbedtls_md_type_t */
