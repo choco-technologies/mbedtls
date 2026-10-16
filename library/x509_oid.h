@@ -32,11 +32,23 @@ extern "C" {
  * \brief Base OID descriptor structure
  */
 typedef struct {
-    const char *MBEDTLS_PRIVATE(asn1);               /*!< OID ASN.1 representation       */
+#if defined(MBEDTLS_DMOD_C)
+    char MBEDTLS_PRIVATE(asn1)[32];
+#else
+    const char *MBEDTLS_PRIVATE(asn1);
+#endif               /*!< OID ASN.1 representation       */
     size_t MBEDTLS_PRIVATE(asn1_len);                /*!< length of asn1                 */
 #if !defined(MBEDTLS_X509_REMOVE_INFO)
-    const char *MBEDTLS_PRIVATE(name);               /*!< official name (e.g. from RFC)  */
-    const char *MBEDTLS_PRIVATE(description);        /*!< human friendly description     */
+#if defined(MBEDTLS_DMOD_C)
+    char MBEDTLS_PRIVATE(name)[96];
+#else
+    const char *MBEDTLS_PRIVATE(name);
+#endif               /*!< official name (e.g. from RFC)  */
+#if defined(MBEDTLS_DMOD_C)
+    char MBEDTLS_PRIVATE(description)[256];
+#else
+    const char *MBEDTLS_PRIVATE(description);
+#endif        /*!< human friendly description     */
 #endif
 } mbedtls_x509_oid_descriptor_t;
 
